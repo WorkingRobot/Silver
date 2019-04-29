@@ -1,0 +1,105 @@
+﻿<Window x:Name="MainWindow1" x:Class="Silver.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Silver" Height="450" Width="800" Icon="Resources/favicon.ico">
+    <Window.InputBindings>
+        <KeyBinding Gesture="Ctrl+N" Command="{Binding New}" />
+        <KeyBinding Gesture="Ctrl+O" Command="{Binding Open}" />
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding Save}" />
+        <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveAs}" />
+        <KeyBinding Gesture="Ctrl+F" Command="{Binding Find}" />
+        <KeyBinding Gesture="Ctrl+E" Command="{Binding EditProject}" />
+    </Window.InputBindings>
+    <Grid>
+        <Menu Width="Auto" Height="20" Margin="0,0,0,0" VerticalAlignment="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New" InputGestureText="Ctrl+N" Click="Click_New"/>
+                <MenuItem Header="_Open..." InputGestureText="Ctrl+O" Click="Click_Open"/>
+                <MenuItem Header="_Save" InputGestureText="Ctrl+S" Click="Click_Save"/>
+                <MenuItem Header="_Save As..." InputGestureText="Ctrl+Shift+S" Click="Click_SaveAs"/>
+                <Separator/>
+                <MenuItem Header="_Exit" InputGestureText="Alt+F4" Click="Click_Exit"/>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Find" InputGestureText="Ctrl+F" Click="Click_Find"/>
+                <MenuItem Header="_Edit Project..." InputGestureText="Ctrl+E" Click="Click_EditProject"/>
+                <Separator/>
+                <MenuItem Header="_Settings..." InputGestureText="Ctrl+P" Click="Click_Settings" IsEnabled="False"/>
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="_Export Manager..." InputGestureText="Ctrl+Shift+E" Click="Click_Exports" IsEnabled="False"/>
+            </MenuItem>
+        </Menu>
+        <Grid Margin="0,20,0,0">
+            <DataGrid Margin="0,34,0,0" x:Name="FilePanel" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" HeadersVisibility="Column" GridLinesVisibility="Vertical" VerticalGridLinesBrush="LightGray" SelectionMode="Extended" IsReadOnly="True">
+                <DataGrid.CellStyle>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="IsEnabled" Value="True"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Openable}" Value="False">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.CellStyle>
+                <DataGrid.ItemContainerStyle>
+                    <Style TargetType="DataGridRow">
+                        <EventSetter Event="MouseDoubleClick" Handler="Entry_DoubleClick"/>
+                    </Style>
+                </DataGrid.ItemContainerStyle>
+
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="300">
+                        <DataGridTemplateColumn.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox/>
+                                <TextBlock Text="Name" Padding="3,0,0,0"/>
+                            </StackPanel>
+                        </DataGridTemplateColumn.Header>
+
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Padding="5,0,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{Binding Pic}" Width="16" Height="16"/>
+                                        <TextBlock Text="{Binding Name}" Padding="3,0,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Binding="{Binding ReadableSize}" Header="Size" Width="50"/>
+
+                    <DataGridTextColumn Binding="{Binding Assets}" Header="Assets" Width="50"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <TextBox x:Name="WorkingDirTxt" Height="24" Margin="92,5,192.6,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="16"/>
+            <Button HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="24" Height="24" BorderBrush="{x:Null}" Background="{x:Null}" Click="Click_Back">
+                <Image Source="Resources/up.ico" RenderTransformOrigin="0.5,0.5">
+                    <Image.RenderTransform>
+                        <RotateTransform Angle="-90"/>
+                    </Image.RenderTransform>
+                </Image>
+            </Button>
+            <Button HorizontalAlignment="Left" Margin="34,5,0,0" VerticalAlignment="Top" Width="24" Height="24" BorderBrush="{x:Null}" Background="{x:Null}" Click="Click_Forward">
+                <Image Source="Resources/up.ico" RenderTransformOrigin="0.5,0.5">
+                    <Image.RenderTransform>
+                        <RotateTransform Angle="90"/>
+                    </Image.RenderTransform>
+                </Image>
+            </Button>
+            <Button HorizontalAlignment="Left" Margin="63,5,0,0" VerticalAlignment="Top" Width="24" Height="24" BorderBrush="{x:Null}" Background="{x:Null}" Click="Click_Up">
+                <Image Source="Resources/up.ico"/>
+            </Button>
+            <TextBox x:Name="FilterTxt" Height="24" Margin="0,5,5,0" TextWrapping="Wrap" Text="Search" VerticalAlignment="Top" HorizontalAlignment="Right" Width="183" FontSize="16" GotFocus="GotFocusPlaceholder" LostFocus="LostFocusPlaceholder" Foreground="Gray" KeyDown="FilterTxt_KeyDown"/>
+            <Button Margin="0,5,5,0" VerticalAlignment="Top" Height="24" BorderBrush="{x:Null}" Background="{x:Null}" HorizontalAlignment="Right" Width="24" Click="Click_Search">
+                <TextBlock Text="🔎" FontSize="14" Foreground="#BF000000" FontWeight="Bold"/>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>
