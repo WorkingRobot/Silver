@@ -32,12 +32,15 @@ namespace Silver
 
         private void Add_File(object sender, RoutedEventArgs e)
         {
-            var file = Helpers.ChooseOpenFile("Pak File", "pak");
-            if (!File.Exists(file)) return;
-            ImportList.Add(new ImportContext
+            var files = Helpers.ChooseOpenFiles("Pak File", "pak");
+            foreach (var file in files)
             {
-                Path = file
-            });
+                if (!File.Exists(file)) continue;
+                ImportList.Add(new ImportContext
+                {
+                    Path = file
+                });
+            }
         }
 
         private void Add_Folder(object sender, RoutedEventArgs e)
@@ -82,11 +85,7 @@ namespace Silver
             {
                 get
                 {
-                    if (key_ == null)
-                    {
-                        return key_ = Helpers.ToHex(Aes);
-                    }
-                    return key_;
+                    return key_ == null ? (key_ = Helpers.ToHex(Aes)) : key_;
                 }
                 set
                 {

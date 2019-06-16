@@ -1,0 +1,14 @@
+# Blender MTL File: 'skybox.blend'
+# Material Count: 1
+
+newmtl skybox
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 1.00000 1.000000 1.00000
+Ks 1.000000 1.0 1.0
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+map_Ka mcsky.png
+map_Kd mcsky.png
+illum 2

@@ -54,5 +54,7 @@ namespace Silver
             }
             return CurrentPoint.Value;
         }
+
+        public string Current => CurrentPoint?.Value;
     }
 }

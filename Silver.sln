@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silver", "Silver\Silver.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AurelienRibon.Ui.SyntaxHighlightBox", "AurelienRibon.Ui.SyntaxHighlightBox\AurelienRibon.Ui.SyntaxHighlightBox.csproj", "{10A9ECD3-AE1E-494D-9A27-8A32DD581759}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silver.ModelViewer", "ModelViewer\Silver.ModelViewer.csproj", "{DB571F4C-6058-4CA4-A93C-84B13A21F662}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{10A9ECD3-AE1E-494D-9A27-8A32DD581759}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10A9ECD3-AE1E-494D-9A27-8A32DD581759}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10A9ECD3-AE1E-494D-9A27-8A32DD581759}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

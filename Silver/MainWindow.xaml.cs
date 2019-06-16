@@ -1,6 +1,8 @@
 ﻿using PakReader;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -29,6 +31,7 @@ namespace Silver
             InitializeComponent();
             DataContext = new Context(this);
             Title = "Silver - Untitled Project";
+            new Startup(this).ShowDialog();
         }
 
         private void Click_New(object sender, RoutedEventArgs e)
@@ -147,7 +150,34 @@ namespace Silver
                         return;
                 }
             }
-            Application.Current.Shutdown();
+            Close();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            if (ProjectDirty)
+            {
+                switch (this.SaveFileCheck())
+                {
+                    case MessageBoxResult.Yes:
+                        string file = Helpers.ChooseSaveFile("Silver Project File", "slv");
+                        if (file != null)
+                        {
+                            Project.Save(file);
+                        }
+                        else // Cancel or X
+                        {
+                            e.Cancel = true;
+                            break;
+                        }
+                        break;
+                    case MessageBoxResult.No:
+                        break;
+                    case MessageBoxResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                }
+            }
         }
 
         private void Click_Find(object sender, RoutedEventArgs e)
@@ -181,13 +211,13 @@ namespace Silver
             if (Searching)
             {
                 Items.Clear();
-                foreach (var entry in Index.GetDirectory(WorkingDir).Search(FilterTxt.Text))
+                foreach (var entry in Index.GetDirectory(History.Current).Search(FilterTxt.Text))
                 {
                     PakPackage file = entry.Value as PakPackage;
                     Items.Add(new PanelItem()
                     {
                         IsDirectory = file == null,
-                        Name = WorkingDir + (string.IsNullOrEmpty(entry.Key.Path) ? "" : entry.Key.Path.Substring(1) + "/") + entry.Key.Name,
+                        Name = History.Current + (string.IsNullOrEmpty(entry.Key.Path) ? "" : entry.Key.Path.Substring(1) + "/") + entry.Key.Name,
                         Size = file != null ? file.uasset?.UncompressedSize ?? 0 + file.uexp?.UncompressedSize ?? 0 + file.ubulk?.UncompressedSize ?? 0 : 0,
                         Assets = file?.ubulk != null ? "Bulk" : null,
                         Openable = file == null || (file.uasset != null && file.uexp != null)
@@ -260,10 +290,10 @@ namespace Silver
             }
         }
 
-        void Refresh()
+        internal void Refresh()
         {
             Items.Clear();
-            var dir = Index.GetDirectory(WorkingDir.Substring(1));
+            var dir = Index.GetDirectory(History.Current);
             if (dir != null)
             {
                 foreach(var entry in dir)
@@ -278,10 +308,11 @@ namespace Silver
                         Openable = file == null || (file.uasset != null && file.uexp != null)
                     });
                 }
+                WorkingDir = History.Current;
             }
         }
 
-        void LoadProject()
+        internal void LoadProject()
         {
             Title = "Silver - " + Project.Name;
             History.Clear();
@@ -312,8 +343,6 @@ namespace Silver
                                 case "ubulk":
                                     package.ubulk = entry.Info;
                                     package.BulkReader = reader;
-                                    break;
-                                case "umap":
                                     break;
                                 default:
                                     //Console.WriteLine($"Unknown extension: {Extension} in {Path}");
@@ -350,7 +379,15 @@ namespace Silver
                 }
                 else
                 {
-                    reader = new PakReader.PakReader(file.Path, file.Key);
+                    try
+                    {
+                        reader = new PakReader.PakReader(file.Path, file.Key);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        continue;
+                    }
                     foreach (var entry in reader.FileInfos)
                     {
                         var (Path, Extension) = Helpers.GetPath(entry.Name);
@@ -407,13 +444,13 @@ namespace Silver
             }
             else
             {
-                OpenViewer(Context.Name, Index[WorkingDir + Context.Name]);
+                OpenViewer(Context.Name, Index[History.Current + Context.Name]);
             }
         }
 
         public void OpenViewer(string fileName, PakPackage package)
         {
-            foreach (var exp in package.Exports)
+            foreach (var exp in package.Exports ?? new ExportObject[0])
             {
                 if (exp is Texture2D)
                 {
@@ -421,7 +458,12 @@ namespace Silver
                     tex.GetImage();
                 }
             }
-            new FileViewer(fileName, package.Exports).ShowDialog();
+            AssetReader r = new AssetReader(
+                    package.AssetReader.GetPackageStream(package.uasset),
+                    package.ExpReader.GetPackageStream(package.uexp),
+                    package.ubulk == null ? null : package.BulkReader.GetPackageStream(package.ubulk)
+                );
+            new FileViewer(fileName, package, p => Index[p]).ShowDialog();
         }
 
         class Context

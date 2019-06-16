@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Silver"
         xmlns:SyntaxHighlightBox="clr-namespace:AurelienRibon.Ui.SyntaxHighlightBox;assembly=AurelienRibon.Ui.SyntaxHighlightBox" x:Class="Silver.FileViewer"
+        xmlns:openTkControl="clr-namespace:OpenTkControl;assembly=OpenTkControl"
         mc:Ignorable="d"
         Title="View File" Height="800" Width="800" Icon="Resources/favicon.ico">
     <Grid>
@@ -33,6 +34,7 @@
             </Rectangle.Fill>
         </Rectangle>
         <Image x:Name="ImagePanel" Margin="0,0,0,126.8" Visibility="Collapsed"/>
+        <openTkControl:ThreadOpenTkControl x:Name="GLPanel" Margin="0,0,0,126.8" Visibility="Collapsed" GlRender="GL_Render" ExceptionOccurred="GL_Error"/>
         <TextBlock Margin="0,0,0,104.8" FontSize="16" HorizontalAlignment="Center" TextAlignment="Center" Text="Exports" VerticalAlignment="Bottom" Width="82"/>
         <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Height="100" VerticalAlignment="Bottom">
             <ItemsControl x:Name="ExportPanel">
@@ -43,11 +45,18 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Click="SelectExport" IsEnabled="{Binding Enabled, Mode=OneWay}" Loaded="LoadedExport">
+                        <Button Click="SelectExport" IsEnabled="{Binding Enabled}" Loaded="LoadedExport" ContextMenuService.ShowOnDisabled="True">
                             <StackPanel>
                                 <Image Source="{Binding Thumbnail}" Width="64" Height="64"/>
                                 <TextBlock Text="{Binding Caption}" TextAlignment="Center"/>
                             </StackPanel>
+
+                            <Button.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Export This" Click="ExportAsset" />
+                                    <MenuItem Header="Save As Raw (uasset, uexp)" Click="SaveAsset" />
+                                </ContextMenu>
+                            </Button.ContextMenu>
                         </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

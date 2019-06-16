@@ -98,8 +98,9 @@ namespace Silver
 
         public static MessageBoxResult SaveFileCheck(this MainWindow me)
         {
-            if (me.Project == null) return MessageBoxResult.No;
-            return AskConfirmation(me, $"Do you want to save changes to {me.Project?.Name ?? "Untitled Project"}?", MessageBoxButton.YesNoCancel);
+            return me.Project == null
+                ? MessageBoxResult.No
+                : AskConfirmation(me, $"Do you want to save changes to {me.Project?.Name ?? "Untitled Project"}?", MessageBoxButton.YesNoCancel);
         }
 
         public static string ChooseSaveFile(string name, string extension)
@@ -110,11 +111,7 @@ namespace Silver
                 DefaultExt = extension,
                 AddExtension = true
             };
-            if (dialog.ShowDialog() ?? false)
-            {
-                return dialog.FileName;
-            }
-            return null;
+            return dialog.ShowDialog() ?? false ? dialog.FileName : null;
         }
 
         public static string ChooseOpenFile(string name, string extension)
@@ -125,11 +122,19 @@ namespace Silver
                 DefaultExt = extension,
                 AddExtension = true
             };
-            if (dialog.ShowDialog() ?? false)
+            return dialog.ShowDialog() ?? false ? dialog.FileName : null;
+        }
+
+        public static string[] ChooseOpenFiles(string name, string extension)
+        {
+            var dialog = new OpenFileDialog
             {
-                return dialog.FileName;
-            }
-            return null;
+                Filter = $"{name} (*.{extension})|*.{extension}",
+                DefaultExt = extension,
+                AddExtension = true,
+                Multiselect = true
+            };
+            return dialog.ShowDialog() ?? false ? dialog.FileNames : null;
         }
 
         public static string ChooseFolder()
