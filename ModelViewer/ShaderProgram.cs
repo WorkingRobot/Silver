@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using ModelViewer.Properties;
 using OpenTK.Graphics.OpenGL4;
 
 namespace Silver.ModelViewer
@@ -124,7 +126,15 @@ namespace Silver.ModelViewer
 
         public uint GetBuffer(string name) => Buffers.ContainsKey(name) ? Buffers[name] : 0;
 
+        public ShaderProgram(byte[] vshader, byte[] fshader)
+        {
+            ProgramID = GL.CreateProgram();
+            LoadShader(Encoding.UTF8.GetString(vshader), ShaderType.VertexShader, out VShaderID);
+            LoadShader(Encoding.UTF8.GetString(fshader), ShaderType.FragmentShader, out FShaderID);
 
+            Link();
+            GenBuffers();
+        }
 
         public ShaderProgram(string vshader, string fshader, bool fromFile = false)
         {

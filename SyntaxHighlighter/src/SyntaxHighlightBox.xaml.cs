@@ -3,15 +3,13 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Windows.Input;
 using System.Collections.Generic;
 using System.Threading;
 using System.Globalization;
 
-namespace AurelienRibon.Ui.SyntaxHighlightBox {
-	public partial class SyntaxHighlightBox : TextBox {
+namespace SyntaxHighlighter
+{
+    public partial class SyntaxHighlightBox : TextBox {
 
 		// --------------------------------------------------------------------
 		// Attributes
@@ -61,6 +59,7 @@ namespace AurelienRibon.Ui.SyntaxHighlightBox {
 			blocks = new List<InnerTextBlock>();
 
 			Loaded += (s, e) => {
+                ApplyTemplate();
 				renderCanvas = (DrawingControl)Template.FindName("PART_RenderCanvas", this);
 				lineNumbersCanvas = (DrawingControl)Template.FindName("PART_LineNumbersCanvas", this);
 				scrollViewer = (ScrollViewer)Template.FindName("PART_ContentHost", this);

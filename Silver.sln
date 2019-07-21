@@ -5,28 +5,28 @@ VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silver", "Silver\Silver.csproj", "{DB4BA473-877B-4732-BDA0-125A06EA0696}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AurelienRibon.Ui.SyntaxHighlightBox", "AurelienRibon.Ui.SyntaxHighlightBox\AurelienRibon.Ui.SyntaxHighlightBox.csproj", "{10A9ECD3-AE1E-494D-9A27-8A32DD581759}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silver.ModelViewer", "ModelViewer\Silver.ModelViewer.csproj", "{DB571F4C-6058-4CA4-A93C-84B13A21F662}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntaxHighlighter", "SyntaxHighlighter\SyntaxHighlighter.csproj", "{10A9ECD3-AE1E-494D-9A27-8A32DD581759}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DB4BA473-877B-4732-BDA0-125A06EA0696}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DB4BA473-877B-4732-BDA0-125A06EA0696}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DB4BA473-877B-4732-BDA0-125A06EA0696}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DB4BA473-877B-4732-BDA0-125A06EA0696}.Release|Any CPU.Build.0 = Release|Any CPU
-		{10A9ECD3-AE1E-494D-9A27-8A32DD581759}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{10A9ECD3-AE1E-494D-9A27-8A32DD581759}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{10A9ECD3-AE1E-494D-9A27-8A32DD581759}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{10A9ECD3-AE1E-494D-9A27-8A32DD581759}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB4BA473-877B-4732-BDA0-125A06EA0696}.Debug|x64.ActiveCfg = Debug|x64
+		{DB4BA473-877B-4732-BDA0-125A06EA0696}.Debug|x64.Build.0 = Debug|x64
+		{DB4BA473-877B-4732-BDA0-125A06EA0696}.Release|x64.ActiveCfg = Release|x64
+		{DB4BA473-877B-4732-BDA0-125A06EA0696}.Release|x64.Build.0 = Release|x64
+		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Debug|x64.ActiveCfg = Debug|x64
+		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Debug|x64.Build.0 = Debug|x64
+		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Release|x64.ActiveCfg = Release|x64
+		{DB571F4C-6058-4CA4-A93C-84B13A21F662}.Release|x64.Build.0 = Release|x64
+		{10A9ECD3-AE1E-494D-9A27-8A32DD581759}.Debug|x64.ActiveCfg = Debug|x64
+		{10A9ECD3-AE1E-494D-9A27-8A32DD581759}.Debug|x64.Build.0 = Debug|x64
+		{10A9ECD3-AE1E-494D-9A27-8A32DD581759}.Release|x64.ActiveCfg = Release|x64
+		{10A9ECD3-AE1E-494D-9A27-8A32DD581759}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

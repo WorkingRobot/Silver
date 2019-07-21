@@ -9,11 +9,6 @@ namespace Silver
         SortedList<string, FSCollection<T>> Directories = new SortedList<string, FSCollection<T>>();
         SortedList<string, T> Files = new SortedList<string, T>();
 
-        public FSCollection()
-        {
-
-        }
-
         public void Add(string key, T value) => Add(Helpers.GetKeys(key), 0, value);
 
         public void Add(string[] keys, T value) => Add(keys, 0, value);

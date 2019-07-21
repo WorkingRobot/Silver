@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Silver.ModelViewer
 {
@@ -34,38 +35,35 @@ namespace Silver.ModelViewer
             Opacity = opacity;
         }
 
-        public static Dictionary<string, Material> LoadFromFile(string filename)
+        public static Dictionary<string, Material> LoadFromResource(byte[] data) => LoadFromString(Encoding.UTF8.GetString(data));
+
+        public static Dictionary<string, Material> LoadFromFile(string filename) => LoadFromString(File.ReadAllText(filename));
+
+        public static Dictionary<string, Material> LoadFromString(string data)
         {
             Dictionary<string, Material> mats = new Dictionary<string, Material>();
 
             try
             {
                 string currentmat = "";
-                using (StreamReader reader = new StreamReader(new FileStream(filename, FileMode.Open, FileAccess.Read)))
+                foreach(var currentLine in data.Split('\n'))
                 {
-                    string currentLine;
-
-                    while (!reader.EndOfStream)
+                    if (!currentLine.StartsWith("newmtl"))
                     {
-                        currentLine = reader.ReadLine();
-
-                        if (!currentLine.StartsWith("newmtl"))
+                        if (currentmat.StartsWith("newmtl"))
                         {
-                            if (currentmat.StartsWith("newmtl"))
-                            {
-                                currentmat += currentLine + "\n";
-                            }
+                            currentmat += currentLine + "\n";
                         }
-                        else
+                    }
+                    else
+                    {
+                        if (currentmat.Length > 0)
                         {
-                            if (currentmat.Length > 0)
-                            {
-                                Material newMat = new Material();
-                                newMat = LoadFromString(currentmat, out var newMatName);
-                                mats.Add(newMatName, newMat);
-                            }
-                            currentmat = currentLine + "\n";
+                            Material newMat = new Material();
+                            newMat = LoadFromString(currentmat, out var newMatName);
+                            mats.Add(newMatName, newMat);
                         }
+                        currentmat = currentLine + "\n";
                     }
                 }
 
@@ -77,13 +75,9 @@ namespace Silver.ModelViewer
                     mats.Add(newMatName, newMat);
                 }
             }
-            catch (FileNotFoundException)
-            {
-                Console.WriteLine("File not found: {0}", filename);
-            }
             catch (Exception)
             {
-                Console.WriteLine("Error loading file: {0}", filename);
+                Console.WriteLine("Error loading material");
             }
 
             return mats;

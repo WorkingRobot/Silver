@@ -4,12 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Silver"
-        xmlns:SyntaxHighlightBox="clr-namespace:AurelienRibon.Ui.SyntaxHighlightBox;assembly=AurelienRibon.Ui.SyntaxHighlightBox" x:Class="Silver.FileViewer"
+        xmlns:sh="clr-namespace:SyntaxHighlighter;assembly=SyntaxHighlighter"
         xmlns:openTkControl="clr-namespace:OpenTkControl;assembly=OpenTkControl"
+        x:Class="Silver.FileViewer"
         mc:Ignorable="d"
-        Title="View File" Height="800" Width="800" Icon="Resources/favicon.ico">
+        Title="View File" Height="500" Width="800" Icon="Resources/favicon.ico">
     <Grid>
-        <SyntaxHighlightBox:SyntaxHighlightBox x:Name="JsonTxt" IsReadOnly="True" Margin="0,0,0,126.8"/>
+        <sh:SyntaxHighlightBox x:Name="JsonTxt" IsReadOnly="True" Margin="0,0,0,126.8" Visibility="Collapsed"/>
         <Rectangle x:Name="ImagePanelBg" Margin="0,0,0,126.8" Visibility="Collapsed">
             <Rectangle.Fill>
                 <DrawingBrush TileMode="Tile" Stretch="None" Viewport="0,0,10,10" ViewportUnits="Absolute">
@@ -35,6 +36,8 @@
         </Rectangle>
         <Image x:Name="ImagePanel" Margin="0,0,0,126.8" Visibility="Collapsed"/>
         <openTkControl:ThreadOpenTkControl x:Name="GLPanel" Margin="0,0,0,126.8" Visibility="Collapsed" GlRender="GL_Render" ExceptionOccurred="GL_Error"/>
+        <sh:SyntaxHighlightBox x:Name="IniTxt" IsReadOnly="True" Margin="0,0,0,126.8" Visibility="Collapsed"/>
+        <sh:SyntaxHighlightBox x:Name="RawTxt" IsReadOnly="True" Margin="0,0,0,126.8" Visibility="Collapsed"/>
         <TextBlock Margin="0,0,0,104.8" FontSize="16" HorizontalAlignment="Center" TextAlignment="Center" Text="Exports" VerticalAlignment="Bottom" Width="82"/>
         <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Height="100" VerticalAlignment="Bottom">
             <ItemsControl x:Name="ExportPanel">

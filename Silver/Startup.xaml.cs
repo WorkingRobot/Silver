@@ -16,29 +16,12 @@ namespace Silver
             MainWindow = mainWindow;
         }
 
-        string[] paks;
-
         private void SelectPaks(object sender, RoutedEventArgs e)
         {
-            var files = Helpers.ChooseOpenFiles("Pak Files", "pak");
-            if (files != null)
-            {
-                paks = files;
-            }
-        }
-
-        private void OpenPaks(object sender, RoutedEventArgs e)
-        {
-            if (paks == null || paks.Length == 0)
-            {
-                Helpers.AskConfirmation(this, "You didn't select any pak files!", MessageBoxButton.OK);
-                return;
-            }
-
-            string aes = AesBox.Text;
+            string aes = AesBox.Text.Trim();
             if (string.IsNullOrWhiteSpace(aes))
             {
-                if (Helpers.AskConfirmation(this, "You didn't enter an AES key! Are you sure these paks are unencrypted?", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                if (Helpers.AskConfirmation(this, "You didn't enter an AES key! Are you sure your paks are unencrypted?", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
                 {
                     return;
                 }
@@ -51,7 +34,9 @@ namespace Silver
             byte[] key;
             try
             {
-                key = Helpers.StringToByteArray(aes);
+                key = Helpers.StringToByteArray(aes.ToLowerInvariant());
+                if (key == null || key.Length != 32)
+                    throw new System.ArgumentNullException();
             }
             catch
             {
@@ -59,8 +44,14 @@ namespace Silver
                 return;
             }
 
+            var files = Helpers.ChooseOpenFiles("Pak Files", "pak");
+            if (files == null || files.Length == 0)
+            {
+                return;
+            }
+
             MainWindow.Project.Name = "Startup Project";
-            foreach (var file in paks)
+            foreach (var file in files)
             {
                 MainWindow.Project.Files.Add(new ProjectFile(file, key));
             }

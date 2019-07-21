@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 
-namespace AurelienRibon.Ui.SyntaxHighlightBox {
-	public class TextUtilities {
+namespace SyntaxHighlighter
+{
+    static class TextUtilities {
 		/// <summary>
 		/// Returns the raw number of the current line count.
 		/// </summary>
-		public static int GetLineCount(String text) {
+		public static int GetLineCount(string text) {
 			int lcnt = 1;
 			for (int i = 0; i < text.Length; i++) {
 				if (text[i] == '\n')

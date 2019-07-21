@@ -24,43 +24,11 @@ namespace Silver
 
         public bool Checked { get; set; }
         public ImageSource Pic => IsDirectory ? DirImage : FileImage;
-        public string ReadableSize
-        {
-            get
-            {
-                if (Size == 0) return null;
-                long absolute_i = Size < 0 ? -Size : Size;
-                string suffix;
-                double readable;
-                if (absolute_i >= 0x40000000)
-                {
-                    suffix = "GB";
-                    readable = Size >> 20;
-                }
-                else if (absolute_i >= 0x100000)
-                {
-                    suffix = "MB";
-                    readable = Size >> 10;
-                }
-                else if (absolute_i >= 0x400)
-                {
-                    suffix = "KB";
-                    readable = Size;
-                }
-                else
-                {
-                    return Size.ToString("0 B");
-                }
-                readable = readable / 1024;
-                return readable.ToString("0.## ") + suffix;
-            }
-        }
+        public string ReadableSize => Size == 0 ? null : Helpers.GetReadableSize(Size);
 
         public bool IsDirectory { get; set; }
         public string Name { get; set; }
         public long Size { get; set; }
         public string Assets { get; set; }
-
-        public bool Openable { get; set; }
     }
 }

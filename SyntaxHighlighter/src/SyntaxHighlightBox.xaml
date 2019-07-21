@@ -1,7 +1,7 @@
-﻿<TextBox x:Class="AurelienRibon.Ui.SyntaxHighlightBox.SyntaxHighlightBox"
+﻿<TextBox x:Class="SyntaxHighlighter.SyntaxHighlightBox"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:local="clr-namespace:AurelienRibon.Ui.SyntaxHighlightBox" TextWrapping="NoWrap" Foreground="#00000000">
+		xmlns:local="clr-namespace:SyntaxHighlighter" TextWrapping="NoWrap" Foreground="#00000000">
 
 	<TextBox.Style>
 		<Style TargetType="{x:Type local:SyntaxHighlightBox}">

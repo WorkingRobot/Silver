@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using ModelViewer.Properties;
+using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
 using OpenTkControl;
@@ -11,9 +12,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
 using PixelFormat = OpenTK.Graphics.OpenGL4.PixelFormat;
 
 namespace Silver.ModelViewer
@@ -22,18 +20,19 @@ namespace Silver.ModelViewer
     {
         int ibo_elements;
         ConcurrentDictionary<int, Volume> objects = new ConcurrentDictionary<int, Volume>();
-        ObjVolume Skybox;
+        Skybox Skybox;
         Text FrameCounter;
 
         Camera cam = new Camera();
-        List<Light> lights = new List<Light>(MAX_LIGHTS);
-        const int MAX_LIGHTS = 5;
+        //List<Light> lights = new List<Light>(MAX_LIGHTS);
+        //const int MAX_LIGHTS = 5;
 
         Matrix4 view = Matrix4.Identity;
         Matrix4 projectionMatrix = Matrix4.Identity;
         Matrix4 screenMatrix = Matrix4.Identity;
 
         public ConcurrentDictionary<string, int> textures = new ConcurrentDictionary<string, int>();
+
         ConcurrentDictionary<string, ShaderProgram> shaders = new ConcurrentDictionary<string, ShaderProgram>();
         ConcurrentDictionary<string, Material> materials = new ConcurrentDictionary<string, Material>();
 
@@ -85,24 +84,26 @@ namespace Silver.ModelViewer
 
         private void LoadResources()
         {
-            shaders.TryAdd("default", new ShaderProgram("vs.glsl", "fs.glsl", true));
-            shaders.TryAdd("textured", new ShaderProgram("vs_tex.glsl", "fs_tex.glsl", true));
-            shaders.TryAdd("normal", new ShaderProgram("vs_norm.glsl", "fs_norm.glsl", true));
-            shaders.TryAdd("lit", new ShaderProgram("vs_lit.glsl", "fs_lit.glsl", true));
-            shaders.TryAdd("lit_multiple", new ShaderProgram("vs_lit.glsl", "fs_lit_multiple.glsl", true));
-            shaders.TryAdd("lit_advanced", new ShaderProgram("vs_lit.glsl", "fs_lit_advanced.glsl", true));
+            //shaders.TryAdd("default", new ShaderProgram(Resources.vs, Resources.fs));
+            shaders.TryAdd("textured", new ShaderProgram(Resources.vs_tex, Resources.fs_tex));
+            //shaders.TryAdd("normal", new ShaderProgram("vs_norm.glsl", "fs_norm.glsl", true));
+            //shaders.TryAdd("lit", new ShaderProgram("vs_lit.glsl", "fs_lit.glsl", true));
+            //shaders.TryAdd("lit_multiple", new ShaderProgram("vs_lit.glsl", "fs_lit_multiple.glsl", true));
+            //shaders.TryAdd("lit_advanced", new ShaderProgram("vs_lit.glsl", "fs_lit_advanced.glsl", true));
 
             // Load materials and textures
-            LoadMaterials("skybox.mtl");
+            LoadMaterials(Resources.skyboxmtl);
         }
 
         private void SetupScene()
         {
-            Skybox = ObjVolume.LoadFromFile("skybox.obj", "textured");
-            Skybox.TextureID = materials["skybox"].DiffuseMap;
-            Skybox.Scale = new Vector3(500, 500, 500);
-            Skybox.Material = materials["skybox"];
-            Skybox.Enabled = false;
+            Skybox = new Skybox
+            {
+                TextureID = materials["skybox"].DiffuseMap,
+                Scale = new Vector3(500, 500, 500),
+                Material = materials["skybox"],
+                Enabled = false
+            };
             AddObject(Skybox);
             AddObject(FrameCounter = new Text((k, v) => textures[k] = v));
 
@@ -116,7 +117,7 @@ namespace Silver.ModelViewer
                 });
             }
 
-            // Create lights
+            /*/ Create lights
             lights.Add(new Light(Vector3.Zero, new Vector3(.65f))
             {
                 Type = LightType.Directional,
@@ -128,6 +129,7 @@ namespace Silver.ModelViewer
                 Type = LightType.Directional,
                 Direction = new Vector3(.5f, 5, -5).Normalized()
             });
+            */
 
             // Move camera away from origin
             cam.Position = new Vector3(0f, 1f, 3f);
@@ -352,6 +354,7 @@ namespace Silver.ModelViewer
                     }
                 }
 
+                /*
                 if (prog.GetUniform("light_position") != -1)
                 {
                     GL.Uniform3(prog.GetUniform("light_position"), ref lights[0].Position);
@@ -419,7 +422,7 @@ namespace Silver.ModelViewer
                     {
                         GL.Uniform1(prog.GetUniform("lights[" + i + "].quadraticAttenuation"), lights[i].QuadraticAttenuation);
                     }
-                }
+                }*/
 
                 GL.DrawElements(BeginMode.Triangles, v.IndiceCount, DrawElementsType.UnsignedInt, indiceat * sizeof(uint));
                 indiceat += v.IndiceCount;
@@ -494,9 +497,9 @@ namespace Silver.ModelViewer
             objects[objC++] = vol;
         }
 
-        private void LoadMaterials(string filename)
+        private void LoadMaterials(byte[] res)
         {
-            foreach (var mat in Material.LoadFromFile(filename))
+            foreach (var mat in Material.LoadFromResource(res))
             {
                 if (!materials.ContainsKey(mat.Key))
                 {

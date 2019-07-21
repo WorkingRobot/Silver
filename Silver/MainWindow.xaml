@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Silver" Height="450" Width="800" Icon="Resources/favicon.ico">
+        Title="Silver - Untitled Project" Height="450" Width="800" Icon="Resources/favicon.ico">
     <Window.InputBindings>
         <KeyBinding Gesture="Ctrl+N" Command="{Binding New}" />
         <KeyBinding Gesture="Ctrl+O" Command="{Binding Open}" />
@@ -34,16 +34,11 @@
             </MenuItem>
         </Menu>
         <Grid Margin="0,20,0,0">
-            <DataGrid Margin="0,34,0,0" x:Name="FilePanel" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" HeadersVisibility="Column" GridLinesVisibility="Vertical" VerticalGridLinesBrush="LightGray" SelectionMode="Extended" IsReadOnly="True">
+            <DataGrid Margin="0,34,0,0" x:Name="FilePanel" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" HeadersVisibility="Column" GridLinesVisibility="Vertical" VerticalGridLinesBrush="LightGray" SelectionMode="Extended" IsReadOnly="True" ContextMenuOpening="Entry_ContextMenu">
                 <DataGrid.CellStyle>
                     <Style TargetType="DataGridCell">
                         <Setter Property="BorderThickness" Value="0"/>
                         <Setter Property="IsEnabled" Value="True"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Openable}" Value="False">
-                                <Setter Property="IsEnabled" Value="False" />
-                            </DataTrigger>
-                        </Style.Triggers>
                     </Style>
                 </DataGrid.CellStyle>
                 <DataGrid.ItemContainerStyle>
@@ -51,6 +46,15 @@
                         <EventSetter Event="MouseDoubleClick" Handler="Entry_DoubleClick"/>
                     </Style>
                 </DataGrid.ItemContainerStyle>
+
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Open" Click="Entry_Open"/>
+                        <MenuItem Header="Save As Raw (uasset, uexp)" Click="Entry_SaveRaw" x:Name="SaveAsRawMenuItem"/>
+                        <MenuItem Header="Copy as path" Click="Entry_CopyPath"/>
+                        <MenuItem Header="Properties" Click="Entry_Properties" x:Name="PropertiesMenuItem"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
 
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Width="300">
@@ -60,7 +64,6 @@
                                 <TextBlock Text="Name" Padding="3,0,0,0"/>
                             </StackPanel>
                         </DataGridTemplateColumn.Header>
-
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Border Padding="5,0,0,0">
@@ -72,13 +75,12 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-
                     <DataGridTextColumn Binding="{Binding ReadableSize}" Header="Size" Width="50"/>
-
                     <DataGridTextColumn Binding="{Binding Assets}" Header="Assets" Width="50"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <TextBox x:Name="WorkingDirTxt" Height="24" Margin="92,5,192.6,0" TextWrapping="WrapWithOverflow" VerticalAlignment="Top" FontSize="16"/>
+
+            <TextBox x:Name="WorkingDirTxt" Height="24" Margin="92,5,192.6,0" VerticalAlignment="Top" FontSize="16"/>
             <Button HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="24" Height="24" BorderBrush="{x:Null}" Background="{x:Null}" Click="Click_Back">
                 <Image Source="Resources/up.ico" RenderTransformOrigin="0.5,0.5">
                     <Image.RenderTransform>
@@ -96,7 +98,7 @@
             <Button HorizontalAlignment="Left" Margin="63,5,0,0" VerticalAlignment="Top" Width="24" Height="24" BorderBrush="{x:Null}" Background="{x:Null}" Click="Click_Up">
                 <Image Source="Resources/up.ico"/>
             </Button>
-            <TextBox x:Name="FilterTxt" Height="24" Margin="0,5,5,0" TextWrapping="Wrap" Text="Search" VerticalAlignment="Top" HorizontalAlignment="Right" Width="183" FontSize="16" GotFocus="GotFocusPlaceholder" LostFocus="LostFocusPlaceholder" Foreground="Gray" KeyDown="FilterTxt_KeyDown"/>
+            <TextBox x:Name="FilterTxt" Height="24" Margin="0,5,5,0" Text="Search" VerticalAlignment="Top" HorizontalAlignment="Right" Width="183" FontSize="16" AcceptsReturn="False" GotFocus="GotFocusPlaceholder" LostFocus="LostFocusPlaceholder" Foreground="Gray" KeyDown="FilterTxt_KeyDown"/>
             <Button Margin="0,5,5,0" VerticalAlignment="Top" Height="24" BorderBrush="{x:Null}" Background="{x:Null}" HorizontalAlignment="Right" Width="24" Click="Click_Search">
                 <TextBlock Text="🔎" FontSize="14" Foreground="#BF000000" FontWeight="Bold"/>
             </Button>

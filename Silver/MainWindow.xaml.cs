@@ -1,8 +1,11 @@
 ﻿using PakReader;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -30,7 +33,6 @@ namespace Silver
         {
             InitializeComponent();
             DataContext = new Context(this);
-            Title = "Silver - Untitled Project";
             new Startup(this).ShowDialog();
         }
 
@@ -208,7 +210,8 @@ namespace Silver
 
         private void Click_Search(object sender, RoutedEventArgs e)
         {
-            if (Searching)
+            Searching = Searching || !string.IsNullOrWhiteSpace(FilterTxt.Text);
+            if (!string.IsNullOrWhiteSpace(FilterTxt.Text))
             {
                 Items.Clear();
                 foreach (var entry in Index.GetDirectory(History.Current).Search(FilterTxt.Text))
@@ -218,9 +221,8 @@ namespace Silver
                     {
                         IsDirectory = file == null,
                         Name = History.Current + (string.IsNullOrEmpty(entry.Key.Path) ? "" : entry.Key.Path.Substring(1) + "/") + entry.Key.Name,
-                        Size = file != null ? file.uasset?.UncompressedSize ?? 0 + file.uexp?.UncompressedSize ?? 0 + file.ubulk?.UncompressedSize ?? 0 : 0,
-                        Assets = file?.ubulk != null ? "Bulk" : null,
-                        Openable = file == null || (file.uasset != null && file.uexp != null)
+                        Size = file != null ? file.Extensions.Values.Sum(kv => kv.Entry?.UncompressedSize ?? 0) : 0,
+                        Assets = file != null ? string.Join(", ", file.Extensions.Keys) : null
                     });
                 }
                 WorkingDir = "Search Results for " + FilterTxt.Text;
@@ -232,7 +234,6 @@ namespace Silver
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {
                 e.Handled = true;
-                Searching = !string.IsNullOrWhiteSpace(FilterTxt.Text);
                 Click_Search(null, null);
             }
         }
@@ -303,152 +304,175 @@ namespace Silver
                     {
                         IsDirectory = file == null,
                         Name = entry.Key,
-                        Size = file != null ? file.uasset?.UncompressedSize ?? 0 + file.uexp?.UncompressedSize ?? 0 + file.ubulk?.UncompressedSize ?? 0 : 0,
-                        Assets = file?.ubulk != null ? "Bulk" : null,
-                        Openable = file == null || (file.uasset != null && file.uexp != null)
+                        Size = file != null ? file.Extensions.Values.Sum(kv => kv.Entry?.UncompressedSize ?? 0) : 0,
+                        Assets = file != null ? string.Join(", ", file.Extensions.Keys) : null
                     });
                 }
                 WorkingDir = History.Current;
             }
         }
 
+        static Dictionary<string, string> exts = new Dictionary<string, string>();
         internal void LoadProject()
         {
-            Title = "Silver - " + Project.Name;
+            LoadingProgress progress = new LoadingProgress
+            {
+                Text = $"Loading Paks (0/{Project.Files.Count})"
+            };
+            Title = $"{Project.Name} - Silver";
             History.Clear();
             WorkingDir = History.Navigate("/");
             FilePanel.ItemsSource = Items;
-            foreach (var file in Project.Files)
+            Task.Run(() =>
             {
                 PakReader.PakReader reader;
-                if (file.Index != null)
+                for (int i = 0; i < Project.Files.Count; i++)
                 {
-                    if (file.Index.Type == ProjectFileIndex.IndexType.FILE_INFO)
+                    Dispatcher.InvokeAsync(() => progress.Text = $"Loading Paks ({i + 1}/{Project.Files.Count})");
+                    reader = null;
+                    var file = Project.Files[i];
+                    if (file.Index != null)
                     {
-                        reader = new PakReader.PakReader(file.Path, file.Key, false);
-                        foreach (var entry in file.Index.Index)
+                        if (file.Index.Type == ProjectFileIndex.IndexType.FILE_INFO)
                         {
-                            var (Path, Extension) = Helpers.GetPath(entry.Name);
-                            var package = Index[file.MountPoint + Path] ?? new PakPackage();
-                            switch (Extension)
+                            reader = new PakReader.PakReader(file.Path, file.Key, false);
+                            foreach (var entry in file.Index.Index)
                             {
-                                case "uasset":
-                                    package.uasset = entry.Info;
-                                    package.AssetReader = reader;
-                                    break;
-                                case "uexp":
-                                    package.uexp = entry.Info;
-                                    package.ExpReader = reader;
-                                    break;
-                                case "ubulk":
-                                    package.ubulk = entry.Info;
-                                    package.BulkReader = reader;
-                                    break;
-                                default:
-                                    //Console.WriteLine($"Unknown extension: {Extension} in {Path}");
-                                    break;
+                                var (Path, Extension) = Helpers.GetPath(entry.Name);
+                                var package = Index[file.MountPoint + Path] ?? new PakPackage();
+                                package.Extensions[Extension] = (entry.Info, reader);
+                                Index[file.MountPoint + Path] = package;
                             }
-                            Index[file.MountPoint + Path] = package;
                         }
-                    }/*
-                    else if (file.Index.Type == ProjectFileIndex.IndexType.FILE_NAME)
-                    {
-                        reader = new PakReader.PakReader(file.Path, file.Key, false);
-                        foreach (var entry in file.Index.Index)
+                        /*else if (file.Index.Type == ProjectFileIndex.IndexType.FILE_NAME)
                         {
-                            var path = Helpers.GetPath(entry.Name);
-                            var package = Index[file.MountPoint + path.Path] ?? new PakPackage();
-                            switch (path.Extension)
+                            reader = new PakReader.PakReader(file.Path, file.Key, false);
+                            foreach (var entry in file.Index.Index)
                             {
-                                case "uasset":
-                                    package.AssetReader = reader;
-                                    break;
-                                case "uexp":
-                                    package.ExpReader = reader;
-                                    break;
-                                case "ubulk":
-                                    package.BulkReader = reader;
-                                    break;
-                                default:
-                                    Console.WriteLine($"Unknown extension: {path.Extension} in {path.Path}");
-                                    break;
+                                var path = Helpers.GetPath(entry.Name);
+                                var package = Index[file.MountPoint + path.Path] ?? new PakPackage();
+                                switch (path.Extension)
+                                {
+                                    case "uasset":
+                                        package.AssetReader = reader;
+                                        break;
+                                    case "uexp":
+                                        package.ExpReader = reader;
+                                        break;
+                                    case "ubulk":
+                                        package.BulkReader = reader;
+                                        break;
+                                    default:
+                                        Console.WriteLine($"Unknown extension: {path.Extension} in {path.Path}");
+                                        break;
+                                }
+                                Index[file.MountPoint + path.Path] = package;
                             }
-                            Index[file.MountPoint + path.Path] = package;
-                        }
-                    }*/
-                }
-                else
-                {
-                    try
-                    {
-                        reader = new PakReader.PakReader(file.Path, file.Key);
+                        }*/
                     }
-                    catch (Exception e)
+                    else
                     {
-                        Console.WriteLine(e.Message);
-                        continue;
-                    }
-                    foreach (var entry in reader.FileInfos)
-                    {
-                        var (Path, Extension) = Helpers.GetPath(entry.Name);
-                        var package = Index[file.MountPoint + Path] ?? new PakPackage();
-                        switch (Extension)
+                        try
                         {
-                            case "uasset":
-                                package.uasset = entry;
-                                package.AssetReader = reader;
-                                break;
-                            case "uexp":
-                                package.uexp = entry;
-                                package.ExpReader = reader;
-                                break;
-                            case "ubulk":
-                                package.ubulk = entry;
-                                package.BulkReader = reader;
-                                break;
-                            case "umap":
-                                break;
-                            default:
-                                //Console.WriteLine($"Unknown extension: {Extension} in {Path}");
-                                break;
+                            reader = new PakReader.PakReader(file.Path, file.Key);
                         }
-                        Index[file.MountPoint + Path] = package;
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                        if (reader != null)
+                        {
+                            string Path, Extension;
+                            PakPackage package;
+                            foreach (var entry in reader.FileInfos)
+                            {
+                                (Path, Extension) = Helpers.GetPath(entry.Name);
+                                package = Index[file.MountPoint + Path];
+                                if (package == null)
+                                {
+                                    Index[file.MountPoint + Path] = package = new PakPackage();
+                                }
+                                package.Extensions[Extension] = (entry, reader);
+                            }
+                        }
                     }
+                    Dispatcher.InvokeAsync(() => progress.Progress = (i + 1d) / Project.Files.Count);
                 }
-            }
+                Dispatcher.InvokeAsync(() => progress.Close());
+            });
+            progress.ShowDialog();
         }
 
-        private void Entry_DoubleClick(object sender, MouseButtonEventArgs e)
+        private void Entry_ContextMenu(object sender, ContextMenuEventArgs e)
         {
-            PanelItem Context = (PanelItem)((DataGridRow)sender).DataContext;
-            if (!Context.Openable) return;
+            PanelItem Context = ((DataGrid)sender).CurrentItem as PanelItem;
+            SaveAsRawMenuItem.IsEnabled = !Context.IsDirectory;
+            PropertiesMenuItem.IsEnabled = !Context.IsDirectory;
+        }
+
+        private void Entry_Open(object sender, RoutedEventArgs e) =>
+            OpenPanelItem((PanelItem)((DataGrid)((ContextMenu)((MenuItem)sender).Parent).PlacementTarget).CurrentItem);
+
+        private void Entry_SaveRaw(object sender, RoutedEventArgs e)
+        {
+            PanelItem Context = (PanelItem)((DataGrid)((ContextMenu)((MenuItem)sender).Parent).PlacementTarget).CurrentItem;
+            if (Context.IsDirectory)
+                Helpers.AskConfirmation(this, "why'd you do that", MessageBoxButton.YesNo);
+            FileViewer.SaveAsset(Index[(Searching ? "" : History.Current) + Context.Name]);
+        }
+
+        private void Entry_CopyPath(object sender, RoutedEventArgs e)
+        {
+            PanelItem Context = (PanelItem)((DataGrid)((ContextMenu)((MenuItem)sender).Parent).PlacementTarget).CurrentItem;
+            Clipboard.SetText((Searching ? "" : History.Current) + Context.Name, TextDataFormat.Text);
+        }
+
+        private void Entry_Properties(object sender, RoutedEventArgs e)
+        {
+            PanelItem Context = (PanelItem)((DataGrid)((ContextMenu)((MenuItem)sender).Parent).PlacementTarget).CurrentItem;
+            string path = (Searching ? "" : History.Current) + Context.Name;
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat("File Name: {0}\n", path);
+            builder.AppendLine("--------------");
+            foreach(var ext in Index[path].Extensions)
+            {
+                var entry = ext.Value.Entry as FPakEntry;
+                builder.AppendFormat("Extension: {0}\nPosition: {1} - {2}\nStruct Size: {3}\nCompression: {4}\nUncompressed Size: {5}\nEncrypted: {6}\n\n", ext.Key, entry.Pos, entry.Pos + entry.Size, entry.StructSize, entry.CompressionMethod == 0 ? "None" : entry.CompressionMethod.ToString(), entry.UncompressedSize, entry.Encrypted ? "Yes" : "No");
+            }
+            Helpers.AskConfirmation(this, builder.ToString(), MessageBoxButton.OK);
+        }
+
+        private void Entry_DoubleClick(object sender, MouseButtonEventArgs e) =>
+            OpenPanelItem((PanelItem)((DataGridRow)sender).DataContext);
+
+        private void OpenPanelItem(PanelItem context)
+        {
             if (Searching)
             {
-                if (Context.IsDirectory)
+                if (context.IsDirectory)
                 {
-                    WorkingDir = History.Navigate(Context.Name + "/");
+                    WorkingDir = History.Navigate(context.Name + "/");
                     Searching = false;
                     Refresh();
                 }
                 else
                 {
-                    OpenViewer(Context.Name, Index[Context.Name]);
+                    OpenViewer(context.Name, Index[context.Name]);
                 }
                 return;
             }
-            if (Context.IsDirectory)
+            if (context.IsDirectory)
             {
-                WorkingDir += Context.Name + "/";
+                WorkingDir += context.Name + "/";
                 History.Navigate(WorkingDir);
                 Refresh();
             }
             else
             {
-                OpenViewer(Context.Name, Index[History.Current + Context.Name]);
+                OpenViewer(History.Current + context.Name, Index[History.Current + context.Name]);
             }
         }
-
-        public void OpenViewer(string fileName, PakPackage package)
+        public void OpenViewer(string title, PakPackage package)
         {
             foreach (var exp in package.Exports ?? new ExportObject[0])
             {
@@ -458,12 +482,7 @@ namespace Silver
                     tex.GetImage();
                 }
             }
-            AssetReader r = new AssetReader(
-                    package.AssetReader.GetPackageStream(package.uasset),
-                    package.ExpReader.GetPackageStream(package.uexp),
-                    package.ubulk == null ? null : package.BulkReader.GetPackageStream(package.ubulk)
-                );
-            new FileViewer(fileName, package, p => Index[p]).ShowDialog();
+            new FileViewer(title, package, p => Index[p]).Show();
         }
 
         class Context

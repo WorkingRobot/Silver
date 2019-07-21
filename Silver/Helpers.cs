@@ -48,16 +48,46 @@ namespace Silver
             string s = i.ToString("x2");
             return s[0] + ((uint)s[1] << 16);
         }).ToArray();
-        public static string ToHex(byte[] bytes)
+        public static string ToHex(byte[] bytes, int length = -1)
         {
-            var result = new char[bytes.Length * 2];
-            for (int i = 0; i < bytes.Length; i++)
+            if (bytes == null) return null;
+            length = (length == -1 || length > bytes.Length) ? bytes.Length : length;
+            var result = new char[length * 2];
+            for (int i = 0; i < length; i++)
             {
                 var val = _Lookup32[bytes[i]];
                 result[2 * i] = (char)val;
                 result[2 * i + 1] = (char)(val >> 16);
             }
             return new string(result);
+        }
+
+        public static string GetReadableSize(long size)
+        {
+            long absolute_i = size < 0 ? -size : size;
+            string suffix;
+            double readable;
+            if (absolute_i >= 0x40000000)
+            {
+                suffix = "GB";
+                readable = size >> 20;
+            }
+            else if (absolute_i >= 0x100000)
+            {
+                suffix = "MB";
+                readable = size >> 10;
+            }
+            else if (absolute_i >= 0x400)
+            {
+                suffix = "KB";
+                readable = size;
+            }
+            else
+            {
+                return size.ToString("0 B");
+            }
+            readable = readable / 1024;
+            return readable.ToString("0.## ") + suffix;
         }
 
         const char DirSeparator = '/';

@@ -23,9 +23,8 @@ namespace Silver.ModelViewer
         public override int IndiceCount => inds.Length;
 
         public new Material Material;
-
-        public string shader = "textured";
-        public override string Shader => shader;
+        
+        public override string Shader => "textured";
 
         internal UMeshSection(CSkeletalMesh mesh, USkeletalMesh umesh, int section, int[] disableOverrides, ModelInterface window, Func<string, PakPackage> packageFunc)
         {
@@ -100,7 +99,7 @@ namespace Silver.ModelViewer
                     SpecularMap = null
                 };
             }
-            var m = package.Exports.FirstOrDefault(o => o is PakReader.Material) as PakReader.Material;
+            var m = package.Exports.FirstOrDefault(o => o is UMaterial) as UMaterial;
             if (m.DiffuseMap == null)
             {
                 m.DiffuseMap = "/Engine/Content/EngineResources/WhiteSquareTexture";

@@ -83,10 +83,7 @@ namespace Silver
             public string Path { get; set; }
             public string Key
             {
-                get
-                {
-                    return key_ == null ? (key_ = Helpers.ToHex(Aes)) : key_;
-                }
+                get => key_ ?? (key_ = Helpers.ToHex(Aes));
                 set
                 {
                     value = value.ToLowerInvariant();
@@ -94,7 +91,11 @@ namespace Silver
                     {
                         value = value.Substring(2);
                     }
-                    Aes = Helpers.StringToByteArray(value);
+                    var aes = Helpers.StringToByteArray(value);
+                    if (aes.Length == 32)
+                    {
+                        Aes = aes;
+                    }
                     key_ = Helpers.ToHex(Aes);
                 }
             }

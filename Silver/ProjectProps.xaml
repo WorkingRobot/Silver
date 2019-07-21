@@ -11,7 +11,7 @@
             <TabItem Header="General">
                 <Grid Background="#FFE5E5E5">
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Text="Project Name" FontSize="14"/>
-                    <TextBox x:Name="ProjectNameTxt" HorizontalAlignment="Left" Height="24" Margin="100,8,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" FontSize="16"/>
+                    <TextBox x:Name="ProjectNameTxt" HorizontalAlignment="Left" Height="24" Margin="100,8,0,0" AcceptsReturn="False" VerticalAlignment="Top" Width="120" FontSize="16"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Imports">
